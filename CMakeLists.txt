@@ -5,5 +5,5 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(C_MTY_TC1031_607_2613_A01199495
 
-        Assignments/Act1.5-SortAlgorithms/bubbleSort.cpp
+        Assignments/Act1.5-SortAlgorithms/Programa2.cpp
 )
