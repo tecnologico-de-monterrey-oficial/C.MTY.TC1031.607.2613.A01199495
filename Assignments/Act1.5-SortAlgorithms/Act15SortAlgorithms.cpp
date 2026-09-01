@@ -28,25 +28,50 @@ void swpaSort(vector<T> &list) {
     }
 }
 
+template <typename T>
+void seleSort(vector<T> &list) {
+    for (int i = 0; i < list.size() - 1;i++) {
+        int min = i;
+        for (int j = i + 1; j < list.size(); j++) {
+            if (list[j] < list[min]) {
+                min = j;
+            }
+        }
+        swap(list[i], list[min]);
+    }
+}
+
+template <typename T>
+void insertSort(vector<T> &list) {
+    for (int i = 1; i < list.size(); i++){
+        T current = list[i];
+        int j = i -1;
+        while (j >= 0 && list[j] > current) {
+            list[j + 1] = list[j];
+            j--;
+        }
+        list[j + 1] = current;
+    }
+}
 
 int main() {
-    vector<int> test = {15,7,3,9,12,5,2};
-    for (int n : test) {
-        cout << n << " ";
-    };
-    cout << endl;
-    bubbleSort(test);
-    for (int n : test) {
-        cout << n << " ";
-    };
+    vector<int> test = {3,7,9,12,15,5,2};
 
     for (int n : test) {
         cout << n << " ";
     }
+
     cout << endl;
-    swpaSort(test);
+    insertSort(test);
+    // seleSort(test);
+    // swpaSort(test);
+    // bubbleSort(test);
+
     for (int n : test) {
         cout << n << " ";
     }
+
+    cout << endl;
+
     return 0;
 }
