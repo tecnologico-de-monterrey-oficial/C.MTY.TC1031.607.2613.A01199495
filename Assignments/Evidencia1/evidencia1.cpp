@@ -21,6 +21,18 @@ struct LogEntry {
     long long timestamp;
 };
 
+bool operator>(const LogEntry &a, const LogEntry &b) {
+    return a.timestamp > b.timestamp;
+}
+
+bool operator<(const LogEntry &a, const LogEntry &b) {
+    return a.timestamp < b.timestamp;
+}
+
+bool operator<=(const LogEntry &a, const LogEntry &b) {
+    return a.timestamp <= b.timestamp;
+}
+
 int getMonthNumber(const string &month) {
     if (month == "Jan") return 1;
     if (month == "Feb") return 2;
@@ -40,11 +52,9 @@ int getMonthNumber(const string &month) {
 
 long long createTimestamp(const LogEntry &entry) {
     int month = getMonthNumber(entry.month);
-
     int hour = stoi(entry.time.substr(0, 2));
     int minute = stoi(entry.time.substr(3, 2));
     int second = stoi(entry.time.substr(6, 2));
-
     long long timestamp = entry.year;
 
     timestamp = timestamp * 100 + month;
@@ -58,8 +68,6 @@ long long createTimestamp(const LogEntry &entry) {
 
 LogEntry parseLine(const string &line) {
     LogEntry entry;
-
-
     stringstream ss(line);
 
     ss >> entry.month;
@@ -79,11 +87,8 @@ LogEntry parseLine(const string &line) {
     return entry;
 }
 
-
-
 vector<LogEntry> readFile(const string &filePath) {
     vector<LogEntry> entries;
-
     ifstream file(filePath);
 
     if (!file.is_open()) {
@@ -112,10 +117,18 @@ void printLogEntry(const LogEntry &entry) {
          << entry.message << endl;
 }
 
+void bubbleSort(vector<LogEntry> &list) {
+    for (int i = 0; i < list.size() - 1; i++) {
+        for (int j = 0; j < list.size() - 1 - i; j++) {
+            if (list[j] > list[j + 1]) {
+                swap(list[j], list[j + 1]);
+            }
+        }
+    }
+}
+
 int main() {
-
     string filePath = "../Assignments/Evidencia1/log607-1.txt";
-
     vector<LogEntry> entries = readFile(filePath);
 
     if (entries.empty()) {
@@ -125,12 +138,20 @@ int main() {
 
     cout << "File read successfully." << endl;
     cout << "Total records: " << entries.size() << endl;
-
     cout << endl;
-    cout << "First record:" << endl;
+
+    cout << "First record before sorting:" << endl;
     printLogEntry(entries[0]);
 
-    cout << "Timestamp: " << entries[0].timestamp << endl;
+    bubbleSort(entries);
+    cout << endl;
+
+    cout << "First record after sorting:" << endl;
+    printLogEntry(entries[0]);
+    cout << endl;
+
+    cout << "Last record after sorting:" << endl;
+    printLogEntry(entries[entries.size() - 1]);
 
     return 0;
 }
