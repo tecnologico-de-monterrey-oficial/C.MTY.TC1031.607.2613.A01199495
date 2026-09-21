@@ -1,6 +1,6 @@
 //
 // Created by Diego Villanueva Fernandez on 20/09/26.
-// Matricula:  A01199495
+// Matricula: A01199495
 //
 
 #include <iostream>
@@ -76,6 +76,7 @@ long long createTimestamp(const LogEntry &entry) {
     int hour = stoi(entry.time.substr(0, 2));
     int minute = stoi(entry.time.substr(3, 2));
     int second = stoi(entry.time.substr(6, 2));
+
     long long timestamp = entry.year;
 
     timestamp = timestamp * 100 + month;
@@ -232,7 +233,12 @@ void saveOutput(const vector<LogEntry> &entries, const string &filePath) {
     file.close();
 }
 
-void saveRange(const vector<LogEntry> &entries, int startIndex, int endIndex, const string &filePath) {
+void saveRange(
+    const vector<LogEntry> &entries,
+    int startIndex,
+    int endIndex,
+    const string &filePath
+) {
     ofstream file(filePath);
 
     if (!file.is_open()) {
@@ -400,7 +406,10 @@ void shellSort(vector<LogEntry> &list) {
     }
 }
 
-int lowerBoundTimestamp(const vector<LogEntry> &entries, long long target) {
+int lowerBoundTimestamp(
+    const vector<LogEntry> &entries,
+    long long target
+) {
     int left = 0;
     int right = entries.size();
 
@@ -418,7 +427,10 @@ int lowerBoundTimestamp(const vector<LogEntry> &entries, long long target) {
     return left;
 }
 
-int upperBoundTimestamp(const vector<LogEntry> &entries, long long target) {
+int upperBoundTimestamp(
+    const vector<LogEntry> &entries,
+    long long target
+) {
     int left = 0;
     int right = entries.size();
 
@@ -458,11 +470,11 @@ string chooseFile(string &fileName) {
 
     if (option == 1) {
         fileName = "log607-1.txt";
-        return "../Assignments/Evidencia1/log607-1.txt";
+        return "../Evidences/Evidence1/Evidencia1/log607-1.txt";
     }
 
     fileName = "log607-2.txt";
-    return "../Assignments/Evidencia1/log607-2.txt";
+    return "../Evidences/Evidence1/Evidencia1/log607-2.txt";
 }
 
 int chooseAlgorithm() {
@@ -599,9 +611,12 @@ int main() {
 
         auto end = chrono::high_resolution_clock::now();
 
-        double time = chrono::duration<double, milli>(end - start).count();
+        double time =
+            chrono::duration<double, milli>(end - start).count();
 
-        string outputPath = "../Assignments/Evidencia1/output607.txt";
+        string outputPath =
+            "../Evidences/Evidence1/Evidencia1/output607.txt";
+
         saveOutput(entries, outputPath);
 
         cout << endl;
@@ -633,18 +648,25 @@ int main() {
         cout << "Did the measured result match your initial prediction? ";
         getline(cin, predictionMatch);
 
-        cout << "Prediction comparison: " << predictionMatch << endl;
+        cout << "Prediction comparison: "
+             << predictionMatch
+             << endl;
 
         string startDate;
         string endDate;
+
         long long startTimestamp;
         long long endTimestamp;
 
         cout << endl;
         cout << "Range search" << endl;
-        cout << "Enter dates using this format: Sep 29 2024 14:37:38" << endl;
+        cout << "Enter dates using this format: "
+             << "Sep 29 2024 14:37:38"
+             << endl;
         cout << "The start and end limits are inclusive." << endl;
-        cout << "If duplicate timestamps match either limit, all duplicates are included." << endl;
+        cout << "If duplicate timestamps match either limit, "
+             << "all duplicates are included."
+             << endl;
 
         while (true) {
             cout << "Start date and time: ";
@@ -667,18 +689,30 @@ int main() {
             }
 
             if (startTimestamp > endTimestamp) {
-                cout << "The end date must be equal to or after the start date." << endl;
+                cout << "The end date must be equal to or after "
+                     << "the start date."
+                     << endl;
                 continue;
             }
 
             break;
         }
 
-        int startIndex = lowerBoundTimestamp(entries, startTimestamp);
-        int endIndex = upperBoundTimestamp(entries, endTimestamp);
+        int startIndex =
+            lowerBoundTimestamp(entries, startTimestamp);
 
-        string rangePath = "../Assignments/Evidencia1/range607.txt";
-        saveRange(entries, startIndex, endIndex, rangePath);
+        int endIndex =
+            upperBoundTimestamp(entries, endTimestamp);
+
+        string rangePath =
+            "../Evidences/Evidence1/Evidencia1/range607.txt";
+
+        saveRange(
+            entries,
+            startIndex,
+            endIndex,
+            rangePath
+        );
 
         cout << endl;
         cout << "Range results:" << endl;
@@ -687,7 +721,10 @@ int main() {
             cout << "No records were found in this range." << endl;
         }
         else {
-            cout << "Records found: " << endIndex - startIndex << endl;
+            cout << "Records found: "
+                 << endIndex - startIndex
+                 << endl;
+
             cout << endl;
 
             for (int i = startIndex; i < endIndex; i++) {
@@ -705,14 +742,22 @@ int main() {
             cout << "Do you want to run another test? (yes/no): ";
             getline(cin, repeatOption);
 
-            if (repeatOption == "yes" || repeatOption == "Yes" ||
-                repeatOption == "y" || repeatOption == "Y") {
+            if (
+                repeatOption == "yes" ||
+                repeatOption == "Yes" ||
+                repeatOption == "y" ||
+                repeatOption == "Y"
+            ) {
                 runAgain = true;
                 break;
             }
 
-            if (repeatOption == "no" || repeatOption == "No" ||
-                repeatOption == "n" || repeatOption == "N") {
+            if (
+                repeatOption == "no" ||
+                repeatOption == "No" ||
+                repeatOption == "n" ||
+                repeatOption == "N"
+            ) {
                 runAgain = false;
                 break;
             }
