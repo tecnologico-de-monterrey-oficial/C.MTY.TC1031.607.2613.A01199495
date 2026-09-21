@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <iomanip>
 
 using namespace std;
 
@@ -199,13 +200,20 @@ vector<LogEntry> readFile(const string &filePath) {
     return entries;
 }
 
+void writeLogEntry(ostream &output, const LogEntry &entry) {
+    output << entry.month << " "
+           << setw(2) << setfill('0') << entry.day << " "
+           << entry.year << " "
+           << entry.time << " "
+           << entry.ip << " "
+           << entry.message;
+
+    output << setfill(' ');
+}
+
 void printLogEntry(const LogEntry &entry) {
-    cout << entry.month << " "
-         << entry.day << " "
-         << entry.year << " "
-         << entry.time << " "
-         << entry.ip << " "
-         << entry.message << endl;
+    writeLogEntry(cout, entry);
+    cout << endl;
 }
 
 void saveOutput(const vector<LogEntry> &entries, const string &filePath) {
@@ -217,12 +225,8 @@ void saveOutput(const vector<LogEntry> &entries, const string &filePath) {
     }
 
     for (const LogEntry &entry : entries) {
-        file << entry.month << " "
-             << entry.day << " "
-             << entry.year << " "
-             << entry.time << " "
-             << entry.ip << " "
-             << entry.message << endl;
+        writeLogEntry(file, entry);
+        file << endl;
     }
 
     file.close();
@@ -237,12 +241,8 @@ void saveRange(const vector<LogEntry> &entries, int startIndex, int endIndex, co
     }
 
     for (int i = startIndex; i < endIndex; i++) {
-        file << entries[i].month << " "
-             << entries[i].day << " "
-             << entries[i].year << " "
-             << entries[i].time << " "
-             << entries[i].ip << " "
-             << entries[i].message << endl;
+        writeLogEntry(file, entries[i]);
+        file << endl;
     }
 
     file.close();
