@@ -392,6 +392,21 @@ int main() {
         return 1;
     }
 
+    cin.ignore();
+
+    string prediction;
+    string predictionReason;
+
+    cout << endl;
+    cout << "How fast do you expect this combination to be?" << endl;
+    cout << "Examples: very fast, fast, medium, slow, very slow" << endl;
+    cout << "Prediction: ";
+    getline(cin, prediction);
+
+    cout << "Why do you expect that result?" << endl;
+    cout << "Reason: ";
+    getline(cin, predictionReason);
+
     cout << endl;
     cout << "First record before sorting:" << endl;
     printLogEntry(entries[0]);
@@ -420,6 +435,11 @@ int main() {
     cout << "Execution time: " << time << " ms" << endl;
     cout << "Best case: " << getBestComplexity(algorithm) << endl;
     cout << "Worst case: " << getWorstComplexity(algorithm) << endl;
+
+    cout << endl;
+    cout << "Initial prediction:" << endl;
+    cout << "Expected speed: " << prediction << endl;
+    cout << "Reason: " << predictionReason << endl;
 
     return 0;
 }
