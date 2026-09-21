@@ -118,6 +118,26 @@ void printLogEntry(const LogEntry &entry) {
          << entry.message << endl;
 }
 
+void saveOutput(const vector<LogEntry> &entries, const string &filePath) {
+    ofstream file(filePath);
+
+    if (!file.is_open()) {
+        cout << "Could not create output607.txt." << endl;
+        return;
+    }
+
+    for (const LogEntry &entry : entries) {
+        file << entry.month << " "
+             << entry.day << " "
+             << entry.year << " "
+             << entry.time << " "
+             << entry.ip << " "
+             << entry.message << endl;
+    }
+
+    file.close();
+}
+
 void swapSort(vector<LogEntry> &list) {
     for (int i = 0; i < list.size() - 1; i++) {
         for (int j = i + 1; j < list.size(); j++) {
@@ -419,6 +439,9 @@ int main() {
 
     double time = chrono::duration<double, milli>(end - start).count();
 
+    string outputPath = "../Assignments/Evidencia1/output607.txt";
+    saveOutput(entries, outputPath);
+
     cout << endl;
     cout << "First record after sorting:" << endl;
     printLogEntry(entries[0]);
@@ -435,6 +458,7 @@ int main() {
     cout << "Execution time: " << time << " ms" << endl;
     cout << "Best case: " << getBestComplexity(algorithm) << endl;
     cout << "Worst case: " << getWorstComplexity(algorithm) << endl;
+    cout << "Output saved in output607.txt" << endl;
 
     cout << endl;
     cout << "Initial prediction:" << endl;
