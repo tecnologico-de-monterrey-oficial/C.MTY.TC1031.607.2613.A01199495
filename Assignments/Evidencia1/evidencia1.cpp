@@ -3,6 +3,11 @@
 // Matricula:  A01199495
 //
 
+//
+// Created by Diego Villanueva Fernandez on 20/09/26.
+// Matricula:  A01199495
+//
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -117,12 +122,154 @@ void printLogEntry(const LogEntry &entry) {
          << entry.message << endl;
 }
 
+void swapSort(vector<LogEntry> &list) {
+    for (int i = 0; i < list.size() - 1; i++) {
+        for (int j = i + 1; j < list.size(); j++) {
+            if (list[i] > list[j]) {
+                swap(list[i], list[j]);
+            }
+        }
+    }
+}
+
 void bubbleSort(vector<LogEntry> &list) {
     for (int i = 0; i < list.size() - 1; i++) {
         for (int j = 0; j < list.size() - 1 - i; j++) {
             if (list[j] > list[j + 1]) {
                 swap(list[j], list[j + 1]);
             }
+        }
+    }
+}
+
+void selectionSort(vector<LogEntry> &list) {
+    for (int i = 0; i < list.size() - 1; i++) {
+        int min = i;
+
+        for (int j = i + 1; j < list.size(); j++) {
+            if (list[j] < list[min]) {
+                min = j;
+            }
+        }
+
+        if (min != i) {
+            swap(list[i], list[min]);
+        }
+    }
+}
+
+void insertionSort(vector<LogEntry> &list) {
+    for (int i = 1; i < list.size(); i++) {
+        LogEntry current = list[i];
+        int j = i - 1;
+
+        while (j >= 0 && list[j] > current) {
+            list[j + 1] = list[j];
+            j--;
+        }
+
+        list[j + 1] = current;
+    }
+}
+
+void merge(vector<LogEntry> &list, int left, int middle, int right) {
+    vector<LogEntry> leftList;
+    vector<LogEntry> rightList;
+
+    for (int i = left; i <= middle; i++) {
+        leftList.push_back(list[i]);
+    }
+
+    for (int i = middle + 1; i <= right; i++) {
+        rightList.push_back(list[i]);
+    }
+
+    int i = 0;
+    int j = 0;
+    int k = left;
+
+    while (i < leftList.size() && j < rightList.size()) {
+        if (leftList[i] <= rightList[j]) {
+            list[k] = leftList[i];
+            i++;
+        }
+        else {
+            list[k] = rightList[j];
+            j++;
+        }
+
+        k++;
+    }
+
+    while (i < leftList.size()) {
+        list[k] = leftList[i];
+        i++;
+        k++;
+    }
+
+    while (j < rightList.size()) {
+        list[k] = rightList[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(vector<LogEntry> &list, int left, int right) {
+    if (left < right) {
+        int middle = left + (right - left) / 2;
+
+        mergeSort(list, left, middle);
+        mergeSort(list, middle + 1, right);
+
+        merge(list, left, middle, right);
+    }
+}
+
+void mergeSort(vector<LogEntry> &list) {
+    mergeSort(list, 0, list.size() - 1);
+}
+
+int partition(vector<LogEntry> &list, int left, int right) {
+    LogEntry pivot = list[right];
+    int i = left - 1;
+
+    for (int j = left; j < right; j++) {
+        if (list[j] <= pivot) {
+            i++;
+            swap(list[i], list[j]);
+        }
+    }
+
+    swap(list[i + 1], list[right]);
+
+    return i + 1;
+}
+
+void quickSort(vector<LogEntry> &list, int left, int right) {
+    if (left < right) {
+        int pivot = partition(list, left, right);
+
+        quickSort(list, left, pivot - 1);
+        quickSort(list, pivot + 1, right);
+    }
+}
+
+void quickSort(vector<LogEntry> &list) {
+    quickSort(list, 0, list.size() - 1);
+}
+
+void shellSort(vector<LogEntry> &list) {
+    for (int gap = list.size() / 2; gap > 0; gap /= 2) {
+        for (int i = gap; i < list.size(); i++) {
+            LogEntry current = list[i];
+            int j = i;
+
+            while (j >= gap && list[j - gap] > current) {
+                list[j] = list[j - gap];
+                j -= gap;
+            }
+
+            list[j] = current;
         }
     }
 }
