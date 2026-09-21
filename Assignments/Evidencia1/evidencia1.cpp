@@ -88,6 +88,18 @@ LogEntry parseLine(const string &line) {
     return entry;
 }
 
+long long parseDateTime(const string &dateTime) {
+    LogEntry entry;
+    stringstream ss(dateTime);
+
+    ss >> entry.month;
+    ss >> entry.day;
+    ss >> entry.year;
+    ss >> entry.time;
+
+    return createTimestamp(entry);
+}
+
 vector<LogEntry> readFile(const string &filePath) {
     vector<LogEntry> entries;
     ifstream file(filePath);
@@ -133,6 +145,26 @@ void saveOutput(const vector<LogEntry> &entries, const string &filePath) {
              << entry.time << " "
              << entry.ip << " "
              << entry.message << endl;
+    }
+
+    file.close();
+}
+
+void saveRange(const vector<LogEntry> &entries, int startIndex, int endIndex, const string &filePath) {
+    ofstream file(filePath);
+
+    if (!file.is_open()) {
+        cout << "Could not create range607.txt." << endl;
+        return;
+    }
+
+    for (int i = startIndex; i < endIndex; i++) {
+        file << entries[i].month << " "
+             << entries[i].day << " "
+             << entries[i].year << " "
+             << entries[i].time << " "
+             << entries[i].ip << " "
+             << entries[i].message << endl;
     }
 
     file.close();
@@ -288,6 +320,42 @@ void shellSort(vector<LogEntry> &list) {
             list[j] = current;
         }
     }
+}
+
+int lowerBoundTimestamp(const vector<LogEntry> &entries, long long target) {
+    int left = 0;
+    int right = entries.size();
+
+    while (left < right) {
+        int middle = left + (right - left) / 2;
+
+        if (entries[middle].timestamp < target) {
+            left = middle + 1;
+        }
+        else {
+            right = middle;
+        }
+    }
+
+    return left;
+}
+
+int upperBoundTimestamp(const vector<LogEntry> &entries, long long target) {
+    int left = 0;
+    int right = entries.size();
+
+    while (left < right) {
+        int middle = left + (right - left) / 2;
+
+        if (entries[middle].timestamp <= target) {
+            left = middle + 1;
+        }
+        else {
+            right = middle;
+        }
+    }
+
+    return left;
 }
 
 string chooseFile(string &fileName) {
@@ -464,6 +532,51 @@ int main() {
     cout << "Initial prediction:" << endl;
     cout << "Expected speed: " << prediction << endl;
     cout << "Reason: " << predictionReason << endl;
+
+    string startDate;
+    string endDate;
+
+    cout << endl;
+    cout << "Range search" << endl;
+    cout << "Enter dates using this format: Sep 29 2024 14:37:38" << endl;
+
+    cout << "Start date and time: ";
+    getline(cin, startDate);
+
+    cout << "End date and time: ";
+    getline(cin, endDate);
+
+    long long startTimestamp = parseDateTime(startDate);
+    long long endTimestamp = parseDateTime(endDate);
+
+    if (startTimestamp > endTimestamp) {
+        cout << "The start date cannot be after the end date." << endl;
+        return 1;
+    }
+
+    int startIndex = lowerBoundTimestamp(entries, startTimestamp);
+    int endIndex = upperBoundTimestamp(entries, endTimestamp);
+
+    string rangePath = "../Assignments/Evidencia1/range607.txt";
+    saveRange(entries, startIndex, endIndex, rangePath);
+
+    cout << endl;
+    cout << "Range results:" << endl;
+
+    if (startIndex >= endIndex) {
+        cout << "No records were found in this range." << endl;
+    }
+    else {
+        cout << "Records found: " << endIndex - startIndex << endl;
+        cout << endl;
+
+        for (int i = startIndex; i < endIndex; i++) {
+            printLogEntry(entries[i]);
+        }
+    }
+
+    cout << endl;
+    cout << "Range saved in range607.txt" << endl;
 
     return 0;
 }
