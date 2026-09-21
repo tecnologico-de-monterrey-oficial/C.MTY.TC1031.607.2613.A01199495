@@ -554,138 +554,175 @@ void runSort(vector<LogEntry> &entries, int algorithm) {
 }
 
 int main() {
-    string fileName;
-    string filePath = chooseFile(fileName);
-    vector<LogEntry> entries = readFile(filePath);
+    bool runAgain = true;
 
-    if (entries.empty()) {
-        cout << "The file is empty or could not be read." << endl;
-        return 1;
-    }
+    while (runAgain) {
+        cout << endl;
+        cout << "----------------------------------------" << endl;
+        cout << "Evidence 1 - Sorting and Range Search" << endl;
+        cout << "----------------------------------------" << endl;
+        cout << endl;
 
-    int algorithm = chooseAlgorithm();
+        string fileName;
+        string filePath = chooseFile(fileName);
+        vector<LogEntry> entries = readFile(filePath);
 
-    cin.ignore(10000, '\n');
+        if (entries.empty()) {
+            cout << "The file is empty or could not be read." << endl;
+            return 1;
+        }
 
-    string prediction;
-    string predictionReason;
+        int algorithm = chooseAlgorithm();
 
-    cout << endl;
-    cout << "How fast do you expect this combination to be?" << endl;
-    cout << "Examples: very fast, fast, medium, slow, very slow" << endl;
-    cout << "Prediction: ";
-    getline(cin, prediction);
+        cin.ignore(10000, '\n');
 
-    cout << "Why do you expect that result?" << endl;
-    cout << "Reason: ";
-    getline(cin, predictionReason);
+        string prediction;
+        string predictionReason;
 
-    cout << endl;
-    cout << "First record before sorting:" << endl;
-    printLogEntry(entries[0]);
+        cout << endl;
+        cout << "How fast do you expect this combination to be?" << endl;
+        cout << "Examples: very fast, fast, medium, slow, very slow" << endl;
+        cout << "Prediction: ";
+        getline(cin, prediction);
 
-    auto start = chrono::high_resolution_clock::now();
+        cout << "Why do you expect that result?" << endl;
+        cout << "Reason: ";
+        getline(cin, predictionReason);
 
-    runSort(entries, algorithm);
+        cout << endl;
+        cout << "First record before sorting:" << endl;
+        printLogEntry(entries[0]);
 
-    auto end = chrono::high_resolution_clock::now();
+        auto start = chrono::high_resolution_clock::now();
 
-    double time = chrono::duration<double, milli>(end - start).count();
+        runSort(entries, algorithm);
 
-    string outputPath = "../Assignments/Evidencia1/output607.txt";
-    saveOutput(entries, outputPath);
+        auto end = chrono::high_resolution_clock::now();
 
-    cout << endl;
-    cout << "First record after sorting:" << endl;
-    printLogEntry(entries[0]);
+        double time = chrono::duration<double, milli>(end - start).count();
 
-    cout << endl;
-    cout << "Last record after sorting:" << endl;
-    printLogEntry(entries[entries.size() - 1]);
+        string outputPath = "../Assignments/Evidencia1/output607.txt";
+        saveOutput(entries, outputPath);
 
-    cout << endl;
-    cout << "Sorting results:" << endl;
-    cout << "File: " << fileName << endl;
-    cout << "Records: " << entries.size() << endl;
-    cout << "Algorithm: " << getAlgorithmName(algorithm) << endl;
-    cout << "Execution time: " << time << " ms" << endl;
-    cout << "Best case: " << getBestComplexity(algorithm) << endl;
-    cout << "Worst case: " << getWorstComplexity(algorithm) << endl;
-    cout << "Output saved in output607.txt" << endl;
+        cout << endl;
+        cout << "First record after sorting:" << endl;
+        printLogEntry(entries[0]);
 
-    cout << endl;
-    cout << "Initial prediction:" << endl;
-    cout << "Expected speed: " << prediction << endl;
-    cout << "Reason: " << predictionReason << endl;
+        cout << endl;
+        cout << "Last record after sorting:" << endl;
+        printLogEntry(entries[entries.size() - 1]);
 
-    string predictionMatch;
+        cout << endl;
+        cout << "Sorting results:" << endl;
+        cout << "File: " << fileName << endl;
+        cout << "Records: " << entries.size() << endl;
+        cout << "Algorithm: " << getAlgorithmName(algorithm) << endl;
+        cout << "Execution time: " << time << " ms" << endl;
+        cout << "Best case: " << getBestComplexity(algorithm) << endl;
+        cout << "Worst case: " << getWorstComplexity(algorithm) << endl;
+        cout << "Output saved in output607.txt" << endl;
 
-    cout << endl;
-    cout << "Did the measured result match your initial prediction? ";
-    getline(cin, predictionMatch);
+        cout << endl;
+        cout << "Initial prediction:" << endl;
+        cout << "Expected speed: " << prediction << endl;
+        cout << "Reason: " << predictionReason << endl;
 
-    cout << "Prediction comparison: " << predictionMatch << endl;
+        string predictionMatch;
 
-    string startDate;
-    string endDate;
-    long long startTimestamp;
-    long long endTimestamp;
+        cout << endl;
+        cout << "Did the measured result match your initial prediction? ";
+        getline(cin, predictionMatch);
 
-    cout << endl;
-    cout << "Range search" << endl;
-    cout << "Enter dates using this format: Sep 29 2024 14:37:38" << endl;
+        cout << "Prediction comparison: " << predictionMatch << endl;
 
-    while (true) {
-        cout << "Start date and time: ";
-        getline(cin, startDate);
+        string startDate;
+        string endDate;
+        long long startTimestamp;
+        long long endTimestamp;
 
-        if (parseDateTime(startDate, startTimestamp)) {
+        cout << endl;
+        cout << "Range search" << endl;
+        cout << "Enter dates using this format: Sep 29 2024 14:37:38" << endl;
+        cout << "The start and end limits are inclusive." << endl;
+        cout << "If duplicate timestamps match either limit, all duplicates are included." << endl;
+
+        while (true) {
+            cout << "Start date and time: ";
+            getline(cin, startDate);
+
+            if (parseDateTime(startDate, startTimestamp)) {
+                break;
+            }
+
+            cout << "Invalid date format. Try again." << endl;
+        }
+
+        while (true) {
+            cout << "End date and time: ";
+            getline(cin, endDate);
+
+            if (!parseDateTime(endDate, endTimestamp)) {
+                cout << "Invalid date format. Try again." << endl;
+                continue;
+            }
+
+            if (startTimestamp > endTimestamp) {
+                cout << "The end date must be equal to or after the start date." << endl;
+                continue;
+            }
+
             break;
         }
 
-        cout << "Invalid date format. Try again." << endl;
-    }
+        int startIndex = lowerBoundTimestamp(entries, startTimestamp);
+        int endIndex = upperBoundTimestamp(entries, endTimestamp);
 
-    while (true) {
-        cout << "End date and time: ";
-        getline(cin, endDate);
+        string rangePath = "../Assignments/Evidencia1/range607.txt";
+        saveRange(entries, startIndex, endIndex, rangePath);
 
-        if (!parseDateTime(endDate, endTimestamp)) {
-            cout << "Invalid date format. Try again." << endl;
-            continue;
-        }
-
-        if (startTimestamp > endTimestamp) {
-            cout << "The end date must be equal to or after the start date." << endl;
-            continue;
-        }
-
-        break;
-    }
-
-    int startIndex = lowerBoundTimestamp(entries, startTimestamp);
-    int endIndex = upperBoundTimestamp(entries, endTimestamp);
-
-    string rangePath = "../Assignments/Evidencia1/range607.txt";
-    saveRange(entries, startIndex, endIndex, rangePath);
-
-    cout << endl;
-    cout << "Range results:" << endl;
-
-    if (startIndex >= endIndex) {
-        cout << "No records were found in this range." << endl;
-    }
-    else {
-        cout << "Records found: " << endIndex - startIndex << endl;
         cout << endl;
+        cout << "Range results:" << endl;
 
-        for (int i = startIndex; i < endIndex; i++) {
-            printLogEntry(entries[i]);
+        if (startIndex >= endIndex) {
+            cout << "No records were found in this range." << endl;
+        }
+        else {
+            cout << "Records found: " << endIndex - startIndex << endl;
+            cout << endl;
+
+            for (int i = startIndex; i < endIndex; i++) {
+                printLogEntry(entries[i]);
+            }
+        }
+
+        cout << endl;
+        cout << "Range saved in range607.txt" << endl;
+
+        string repeatOption;
+
+        while (true) {
+            cout << endl;
+            cout << "Do you want to run another test? (yes/no): ";
+            getline(cin, repeatOption);
+
+            if (repeatOption == "yes" || repeatOption == "Yes" ||
+                repeatOption == "y" || repeatOption == "Y") {
+                runAgain = true;
+                break;
+            }
+
+            if (repeatOption == "no" || repeatOption == "No" ||
+                repeatOption == "n" || repeatOption == "N") {
+                runAgain = false;
+                break;
+            }
+
+            cout << "Invalid option. Enter yes or no." << endl;
         }
     }
 
     cout << endl;
-    cout << "Range saved in range607.txt" << endl;
+    cout << "Program finished." << endl;
 
     return 0;
 }
