@@ -51,6 +51,25 @@ int getMonthNumber(const string &month) {
     return 0;
 }
 
+bool isLeapYear(int year) {
+    if (year % 400 == 0) return true;
+    if (year % 100 == 0) return false;
+    return year % 4 == 0;
+}
+
+int getDaysInMonth(int month, int year) {
+    if (month == 2) {
+        if (isLeapYear(year)) return 29;
+        return 28;
+    }
+
+    if (month == 4 || month == 6 || month == 9 || month == 11) {
+        return 30;
+    }
+
+    return 31;
+}
+
 long long createTimestamp(const LogEntry &entry) {
     int month = getMonthNumber(entry.month);
     int hour = stoi(entry.time.substr(0, 2));
@@ -88,16 +107,75 @@ LogEntry parseLine(const string &line) {
     return entry;
 }
 
-long long parseDateTime(const string &dateTime) {
-    LogEntry entry;
+bool parseDateTime(const string &dateTime, long long &timestamp) {
+    string month;
+    string time;
+    int day;
+    int year;
+
     stringstream ss(dateTime);
 
-    ss >> entry.month;
-    ss >> entry.day;
-    ss >> entry.year;
-    ss >> entry.time;
+    if (!(ss >> month >> day >> year >> time)) {
+        return false;
+    }
 
-    return createTimestamp(entry);
+    string extra;
+
+    if (ss >> extra) {
+        return false;
+    }
+
+    int monthNumber = getMonthNumber(month);
+
+    if (monthNumber == 0) {
+        return false;
+    }
+
+    if (year < 1) {
+        return false;
+    }
+
+    if (day < 1 || day > getDaysInMonth(monthNumber, year)) {
+        return false;
+    }
+
+    if (time.length() != 8 || time[2] != ':' || time[5] != ':') {
+        return false;
+    }
+
+    for (int i = 0; i < time.length(); i++) {
+        if (i == 2 || i == 5) continue;
+
+        if (time[i] < '0' || time[i] > '9') {
+            return false;
+        }
+    }
+
+    int hour = stoi(time.substr(0, 2));
+    int minute = stoi(time.substr(3, 2));
+    int second = stoi(time.substr(6, 2));
+
+    if (hour < 0 || hour > 23) {
+        return false;
+    }
+
+    if (minute < 0 || minute > 59) {
+        return false;
+    }
+
+    if (second < 0 || second > 59) {
+        return false;
+    }
+
+    LogEntry entry;
+    entry.month = month;
+    entry.day = day;
+    entry.year = year;
+    entry.time = time;
+
+    timestamp = createTimestamp(entry);
+
+    return true;
 }
 
 vector<LogEntry> readFile(const string &filePath) {
@@ -361,38 +439,56 @@ int upperBoundTimestamp(const vector<LogEntry> &entries, long long target) {
 string chooseFile(string &fileName) {
     int option;
 
-    cout << "Choose a file:" << endl;
-    cout << "1. log607-1.txt" << endl;
-    cout << "2. log607-2.txt" << endl;
-    cout << "Option: ";
-    cin >> option;
+    while (true) {
+        cout << "Choose a file:" << endl;
+        cout << "1. log607-1.txt" << endl;
+        cout << "2. log607-2.txt" << endl;
+        cout << "Option: ";
+
+        if (cin >> option && (option == 1 || option == 2)) {
+            break;
+        }
+
+        cout << "Invalid option. Enter 1 or 2." << endl;
+        cout << endl;
+
+        cin.clear();
+        cin.ignore(10000, '\n');
+    }
 
     if (option == 1) {
         fileName = "log607-1.txt";
         return "../Assignments/Evidencia1/log607-1.txt";
     }
-    else if (option == 2) {
-        fileName = "log607-2.txt";
-        return "../Assignments/Evidencia1/log607-2.txt";
-    }
 
-    return "";
+    fileName = "log607-2.txt";
+    return "../Assignments/Evidencia1/log607-2.txt";
 }
 
 int chooseAlgorithm() {
     int option;
 
-    cout << endl;
-    cout << "Choose a sorting algorithm:" << endl;
-    cout << "1. Swap Sort" << endl;
-    cout << "2. Bubble Sort" << endl;
-    cout << "3. Selection Sort" << endl;
-    cout << "4. Insertion Sort" << endl;
-    cout << "5. Merge Sort" << endl;
-    cout << "6. Quick Sort" << endl;
-    cout << "7. Shell Sort" << endl;
-    cout << "Option: ";
-    cin >> option;
+    while (true) {
+        cout << endl;
+        cout << "Choose a sorting algorithm:" << endl;
+        cout << "1. Swap Sort" << endl;
+        cout << "2. Bubble Sort" << endl;
+        cout << "3. Selection Sort" << endl;
+        cout << "4. Insertion Sort" << endl;
+        cout << "5. Merge Sort" << endl;
+        cout << "6. Quick Sort" << endl;
+        cout << "7. Shell Sort" << endl;
+        cout << "Option: ";
+
+        if (cin >> option && option >= 1 && option <= 7) {
+            break;
+        }
+
+        cout << "Invalid option. Enter a number from 1 to 7." << endl;
+
+        cin.clear();
+        cin.ignore(10000, '\n');
+    }
 
     return option;
 }
@@ -460,12 +556,6 @@ void runSort(vector<LogEntry> &entries, int algorithm) {
 int main() {
     string fileName;
     string filePath = chooseFile(fileName);
-
-    if (filePath == "") {
-        cout << "Invalid file option." << endl;
-        return 1;
-    }
-
     vector<LogEntry> entries = readFile(filePath);
 
     if (entries.empty()) {
@@ -475,12 +565,7 @@ int main() {
 
     int algorithm = chooseAlgorithm();
 
-    if (algorithm < 1 || algorithm > 7) {
-        cout << "Invalid algorithm option." << endl;
-        return 1;
-    }
-
-    cin.ignore();
+    cin.ignore(10000, '\n');
 
     string prediction;
     string predictionReason;
@@ -533,25 +618,49 @@ int main() {
     cout << "Expected speed: " << prediction << endl;
     cout << "Reason: " << predictionReason << endl;
 
+    string predictionMatch;
+
+    cout << endl;
+    cout << "Did the measured result match your initial prediction? ";
+    getline(cin, predictionMatch);
+
+    cout << "Prediction comparison: " << predictionMatch << endl;
+
     string startDate;
     string endDate;
+    long long startTimestamp;
+    long long endTimestamp;
 
     cout << endl;
     cout << "Range search" << endl;
     cout << "Enter dates using this format: Sep 29 2024 14:37:38" << endl;
 
-    cout << "Start date and time: ";
-    getline(cin, startDate);
+    while (true) {
+        cout << "Start date and time: ";
+        getline(cin, startDate);
 
-    cout << "End date and time: ";
-    getline(cin, endDate);
+        if (parseDateTime(startDate, startTimestamp)) {
+            break;
+        }
 
-    long long startTimestamp = parseDateTime(startDate);
-    long long endTimestamp = parseDateTime(endDate);
+        cout << "Invalid date format. Try again." << endl;
+    }
 
-    if (startTimestamp > endTimestamp) {
-        cout << "The start date cannot be after the end date." << endl;
-        return 1;
+    while (true) {
+        cout << "End date and time: ";
+        getline(cin, endDate);
+
+        if (!parseDateTime(endDate, endTimestamp)) {
+            cout << "Invalid date format. Try again." << endl;
+            continue;
+        }
+
+        if (startTimestamp > endTimestamp) {
+            cout << "The end date must be equal to or after the start date." << endl;
+            continue;
+        }
+
+        break;
     }
 
     int startIndex = lowerBoundTimestamp(entries, startTimestamp);
