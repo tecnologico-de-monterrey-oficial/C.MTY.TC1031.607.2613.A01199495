@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -269,7 +270,7 @@ void shellSort(vector<LogEntry> &list) {
     }
 }
 
-string chooseFile() {
+string chooseFile(string &fileName) {
     int option;
 
     cout << "Choose a file:" << endl;
@@ -279,9 +280,11 @@ string chooseFile() {
     cin >> option;
 
     if (option == 1) {
+        fileName = "log607-1.txt";
         return "../Assignments/Evidencia1/log607-1.txt";
     }
     else if (option == 2) {
+        fileName = "log607-2.txt";
         return "../Assignments/Evidencia1/log607-2.txt";
     }
 
@@ -318,6 +321,30 @@ string getAlgorithmName(int algorithm) {
     return "";
 }
 
+string getBestComplexity(int algorithm) {
+    if (algorithm == 1) return "O(n^2)";
+    if (algorithm == 2) return "O(n^2)";
+    if (algorithm == 3) return "O(n^2)";
+    if (algorithm == 4) return "O(n)";
+    if (algorithm == 5) return "O(n log n)";
+    if (algorithm == 6) return "O(n log n)";
+    if (algorithm == 7) return "O(n log n)";
+
+    return "";
+}
+
+string getWorstComplexity(int algorithm) {
+    if (algorithm == 1) return "O(n^2)";
+    if (algorithm == 2) return "O(n^2)";
+    if (algorithm == 3) return "O(n^2)";
+    if (algorithm == 4) return "O(n^2)";
+    if (algorithm == 5) return "O(n log n)";
+    if (algorithm == 6) return "O(n^2)";
+    if (algorithm == 7) return "O(n^2)";
+
+    return "";
+}
+
 void runSort(vector<LogEntry> &entries, int algorithm) {
     if (algorithm == 1) {
         swapSort(entries);
@@ -343,7 +370,8 @@ void runSort(vector<LogEntry> &entries, int algorithm) {
 }
 
 int main() {
-    string filePath = chooseFile();
+    string fileName;
+    string filePath = chooseFile(fileName);
 
     if (filePath == "") {
         cout << "Invalid file option." << endl;
@@ -365,23 +393,33 @@ int main() {
     }
 
     cout << endl;
-    cout << "File read successfully." << endl;
-    cout << "Total records: " << entries.size() << endl;
-    cout << "Algorithm: " << getAlgorithmName(algorithm) << endl;
-    cout << endl;
-
     cout << "First record before sorting:" << endl;
     printLogEntry(entries[0]);
 
+    auto start = chrono::high_resolution_clock::now();
+
     runSort(entries, algorithm);
+
+    auto end = chrono::high_resolution_clock::now();
+
+    double time = chrono::duration<double, milli>(end - start).count();
 
     cout << endl;
     cout << "First record after sorting:" << endl;
     printLogEntry(entries[0]);
-    cout << endl;
 
+    cout << endl;
     cout << "Last record after sorting:" << endl;
     printLogEntry(entries[entries.size() - 1]);
+
+    cout << endl;
+    cout << "Sorting results:" << endl;
+    cout << "File: " << fileName << endl;
+    cout << "Records: " << entries.size() << endl;
+    cout << "Algorithm: " << getAlgorithmName(algorithm) << endl;
+    cout << "Execution time: " << time << " ms" << endl;
+    cout << "Best case: " << getBestComplexity(algorithm) << endl;
+    cout << "Worst case: " << getWorstComplexity(algorithm) << endl;
 
     return 0;
 }
