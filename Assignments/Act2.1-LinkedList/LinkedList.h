@@ -47,7 +47,7 @@ public:
 
     void insert(int index, const T& data) {
         if (index < 0 || index >= size) {
-            throw out_of_range("el indice que pusiste esta fuera del rango, checa si no me pediste un numero menor a 0 o uno mayor al size");
+            throw std::out_of_range("el indice que pusiste esta fuera del rango, checa si no me pediste un numero menor a 0 o uno mayor al size");
         }
             Node<T>* aux = head;
             int i = 0;
@@ -92,5 +92,95 @@ public:
         return true;
     }
 
+    bool deleteAt(int index) {
+        if (index < 0 || index >= size) {
+            return false;
+        }
+
+        if (index == 0) {
+            Node<T>* temp = head;
+            head = head->next;
+            delete temp;
+            size--;
+            return true;
+        }
+
+        Node<T>* aux = head;
+        int i = 0;
+
+        while (i < index - 1) {
+            aux = aux->next;
+            i++;
+        }
+
+        Node<T>* temp = aux->next;
+        aux->next = temp->next;
+        delete temp;
+        size--;
+
+        return true;
+
+    }
+
+    T getData(int index) {
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("o pusiste que querias un indice menor a 0 o un indice mayor al tamaño de la lista vuelve a preguntar ");
+        }
+
+        Node<T>* aux = head;
+        int i = 0;
+
+        while (i < index) {
+            aux = aux->next;
+            i++;
+        }
+
+        return aux->data;
+    }
+
+    void updateData(const T& oldData, const T& newData) {
+        Node<T>* aux = head;
+
+        while (aux != nullptr && aux->data != oldData) {
+            aux = aux->next;
+        }
+
+        if (aux == nullptr) {
+            throw std::out_of_range("o pusiste que querias un indice menor a 0 o un indice mayor al tamaño de la lista vuelve a preguntar ");
+        }
+
+        aux->data = newData;
+    }
+
+    void updateAt(int index, const T& newData) {
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("o pusiste que querias cambiar indice menor a 0 o un indice mayor al tamaño de la lista vuelve a preguntar ");
+        }
+
+        Node<T>* aux = head;
+        int i = 0;
+
+        while (i<index) {
+            aux = aux->next;
+            i++;
+        }
+
+        aux->data = newData;
+    }
+
+    int findData(const T& data) {
+        Node<T>* aux = head;
+        int index = 0;
+
+        while (aux != nullptr) {
+            if (aux->data == data) {
+                return index;
+            }
+            aux = aux->next;
+            index++;
+        }
+
+        return -1;
+    }
 };
 #endif //C_MTY_TC1031_607_2613_A01199495_LINKEDLIST_H
