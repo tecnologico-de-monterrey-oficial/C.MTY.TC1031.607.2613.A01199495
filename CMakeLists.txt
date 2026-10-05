@@ -7,4 +7,6 @@ add_executable(C_MTY_TC1031_607_2613_A01199495
 
 
         Assignments/Act2.1-LinkedList/NotasDeClase.cpp
+        Assignments/Act2.1-LinkedList/Node.h
+        Assignments/Act2.1-LinkedList/LinkedList.h
 )
