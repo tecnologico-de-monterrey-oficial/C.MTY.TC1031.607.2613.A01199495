@@ -146,8 +146,7 @@ public:
         }
 
         if (aux == nullptr) {
-            throw std::out_of_range("o pusiste que querias un indice menor a 0 o un indice mayor al tamaño de la lista vuelve a preguntar ");
-        }
+            throw std::out_of_range("El dato que quieres actualizar no existe en la lista");        }
 
         aux->data = newData;
     }
@@ -181,6 +180,47 @@ public:
         }
 
         return -1;
+    }
+
+    T& operator[](int index) {
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("quisiste actualizar o leer un indice menor a 0 o mayor a la size de la lista");
+        }
+
+        Node<T>* aux = head;
+        int i = 0;
+
+        while (i < index) {
+            aux = aux->next;
+            i++;
+        }
+
+        return aux->data;
+    }
+
+    LinkedList<T>& operator=(const LinkedList<T>& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        Node<T>* aux = head;
+        while (aux != nullptr) {
+            Node<T>* temp = aux;
+            aux = aux->next;
+            delete temp;
+        }
+
+        head = nullptr;
+        size = 0;
+
+        aux = other.head;
+
+        while (aux != nullptr) {
+            addLast(aux->data);
+            aux = aux->next;
+        }
+
+        return *this;
     }
 };
 #endif //C_MTY_TC1031_607_2613_A01199495_LINKEDLIST_H
