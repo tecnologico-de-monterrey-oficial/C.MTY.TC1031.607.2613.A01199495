@@ -8,5 +8,7 @@ add_executable(C_MTY_TC1031_607_2613_A01199495
 
 
 
-        Assignments/Act2.3-Queue/Queue.cpp
+        Assignments/Act2.4-Stack/NotasDeClase.cpp
+        Assignments/Act2.4-Stack/Stack.cpp
+        Assignments/Act2.4-Stack/Stack.h
 )
