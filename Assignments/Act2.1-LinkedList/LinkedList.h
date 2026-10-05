@@ -7,6 +7,7 @@
 #define C_MTY_TC1031_607_2613_A01199495_LINKEDLIST_H
 #include "Node.h"
 #include <stdexcept>
+#include <iostream>
 template<typename T>
 class LinkedList {
 private:
@@ -221,6 +222,16 @@ public:
         }
 
         return *this;
+    }
+    void print() const {
+        Node<T>* aux = head;
+
+        while (aux != nullptr) {
+            std::cout << aux->data << " -> ";
+            aux = aux->next;
+        }
+
+        std::cout << "nullptr" << std::endl;
     }
 };
 #endif //C_MTY_TC1031_607_2613_A01199495_LINKEDLIST_H
