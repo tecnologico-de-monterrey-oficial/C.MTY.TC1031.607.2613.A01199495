@@ -60,9 +60,37 @@ public:
             Node<T>* nuevo = new Node<T>(data, aux->next);
             aux->next = nuevo;
             size++;
-
     }
 
+    bool deleteData(const T& data) {
+        if (head == nullptr) {
+            return false;
+        }
+
+        if (head->data == data) {
+            Node<T>* temp = head;
+            head = head->next;
+            delete temp;
+            size--;
+            return true;
+        }
+
+        Node<T>* aux = head;
+        while (aux->next != nullptr && aux->next->data != data) {
+            aux = aux->next;
+        }
+
+        if (aux->next == nullptr) {
+            return false;
+        }
+
+        Node<T>* temp = aux->next;
+        aux->next = temp->next;
+        delete temp;
+        size--;
+
+        return true;
+    }
 
 };
 #endif //C_MTY_TC1031_607_2613_A01199495_LINKEDLIST_H
