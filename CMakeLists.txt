@@ -6,9 +6,5 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(C_MTY_TC1031_607_2613_A01199495
 
 
-
-
-        Assignments/Act2.4-Stack/NotasDeClase.cpp
-        Assignments/Act2.4-Stack/Stack.cpp
-        Assignments/Act2.4-Stack/Stack.h
+        Assignments/Act2.2-DoublyLinkedList/DoublyLinkedList.cpp
 )
