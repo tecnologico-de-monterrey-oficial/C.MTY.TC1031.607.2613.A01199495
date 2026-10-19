@@ -10,6 +10,7 @@
 #include <cmath>
 #include <filesystem>
 #include <iomanip>
+#include <map>
 #include "../include/Log.h"
 #include "../include/Queue.h"
 #include "../include/DoublyLinkedList.h"
@@ -201,6 +202,53 @@ void mostrarDescendente(const DoublyLinkedList<Log>& registros, Log& ultimaFecha
     while (!pila.isEmpty()) cout << pila.pop() << '\n';
     cout << "Total encontrados: " << total << '\n';
 }
+// Muestra todos los elementos que tienen la frecuencia mas alta.
+void mostrarMaximos(const map<string, int>& conteos) {
+    if (conteos.empty()) {
+        cout << "No hay datos disponibles.\n";
+        return;
+    }
+
+    int maximo = 0;
+    for (const auto& elemento : conteos) {
+        if (elemento.second > maximo) maximo = elemento.second;
+    }
+
+    for (const auto& elemento : conteos) {
+        if (elemento.second == maximo) {
+            cout << "  " << elemento.first << ": " << elemento.second << " apariciones\n";
+        }
+    }
+}
+
+// Recorre los logs y cuenta las fechas, los tipos de evento y las IP.
+void mostrarEstadisticas(const DoublyLinkedList<Log>& registros) {
+    cout << "\n========== ESTADISTICAS DEL ARCHIVO ==========\n";
+    cout << "Total de registros: " << registros.getSize() << '\n';
+
+    if (registros.isEmpty()) {
+        cout << "No hay registros para analizar.\n";
+        return;
+    }
+
+    map<string, int> conteoDias;
+    map<string, int> conteoEventos;
+    map<string, int> conteoIPs;
+
+    for (DoubleNode<Log>* actual = registros.getHead(); actual != nullptr; actual = actual->next) {
+        const Log& log = actual->data;
+        conteoDias[log.dayString()]++;
+        conteoEventos[log.event]++;
+        conteoIPs[log.ip]++;
+    }
+
+    cout << "\nDia(s) con mas incidentes:\n";
+    mostrarMaximos(conteoDias);
+    cout << "\nTipo(s) de evento mas frecuente(s):\n";
+    mostrarMaximos(conteoEventos);
+    cout << "\nDireccion(es) IP mas frecuente(s):\n";
+    mostrarMaximos(conteoIPs);
+}
 
 int main() {
     cout << "========================================\n";
@@ -256,7 +304,7 @@ int main() {
             cout << "1. Ordenar logs por fecha y hora\n";
             cout << "2. Buscar logs por dia\n";
             cout << "3. Mostrar por dia en orden descendente\n";
-            cout << "4. Estadisticas del archivo (proximamente)\n";
+            cout << "4. Estadisticas del archivo\n";
             cout << "5. Salir\n";
             cout << "Opcion: ";
             string opcionMenu;
@@ -268,7 +316,7 @@ int main() {
             } else if (opcionMenu == "3") {
                 mostrarDescendente(registros, ultimaFecha, hayBusqueda);
             } else if (opcionMenu == "4") {
-                cout << "Esta opcion se implementara en el siguiente commit.\n";
+                mostrarEstadisticas(registros);
             } else if (opcionMenu == "5") {
                 cout << "Hasta luego.\n";
                 return 0;
