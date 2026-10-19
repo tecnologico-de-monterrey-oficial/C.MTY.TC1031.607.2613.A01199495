@@ -13,6 +13,7 @@
 #include "../include/Log.h"
 #include "../include/Queue.h"
 #include "../include/DoublyLinkedList.h"
+#include "../include/Stack.h"
 
 using namespace std;
 
@@ -107,6 +108,100 @@ void ordenarLogs(DoublyLinkedList<Log>& registros, const string& ruta) {
     guardarOrdenados(registros);
 }
 
+// Pide un dia con formato Mmm DD AAAA y verifica que exista.
+bool pedirDia(Log& fecha) {
+    cout << "Ingresa el dia (ejemplo: Sep 14 2024): ";
+    string texto;
+    if (!getline(cin, texto)) return false;
+    istringstream entrada(texto);
+    string mes, diaTexto, anioTexto, extra;
+    if (!(entrada >> mes >> diaTexto >> anioTexto) || (entrada >> extra)) {
+        cout << "Formato invalido. Usa Mmm DD AAAA.\n";
+        return false;
+    }
+    auto esNumero = [](const string& valor) {
+        if (valor.empty()) return false;
+        for (char c : valor) {
+            if (c < '0' || c > '9') return false;
+        }
+        return true;
+    };
+    int numeroMes = Log::monthNumber(mes);
+    if (numeroMes == 0 || !esNumero(diaTexto) || diaTexto.size() != 2 ||
+        !esNumero(anioTexto) || anioTexto.size() != 4) {
+        cout << "Formato invalido. Usa Mmm DD AAAA.\n";
+        return false;
+    }
+    int dia = stoi(diaTexto);
+    int anio = stoi(anioTexto);
+    if (!Log::validDate(anio, numeroMes, dia)) {
+        cout << "La fecha no existe.\n";
+        return false;
+    }
+    fecha.year = anio;
+    fecha.month = numeroMes;
+    fecha.day = dia;
+    return true;
+}
+
+// Compara solo anio, mes y dia.
+int compararDias(const Log& a, const Log& b) {
+    if (a.year != b.year) return a.year < b.year ? -1 : 1;
+    if (a.month != b.month) return a.month < b.month ? -1 : 1;
+    if (a.day != b.day) return a.day < b.day ? -1 : 1;
+    return 0;
+}
+
+// Guarda la ultima fecha consultada para reutilizarla en la opcion 3.
+void buscarPorDia(const DoublyLinkedList<Log>& registros, Log& ultimaFecha,
+                  bool& hayBusqueda) {
+    if (!registros.isSorted()) {
+        cout << "Primero debes ordenar los logs con la opcion 1.\n";
+        return;
+    }
+    Log fecha;
+    if (!pedirDia(fecha)) return;
+    ultimaFecha = fecha;
+    hayBusqueda = true;
+    int total = 0;
+    cout << "\nLogs del dia " << fecha.dayString() << ":\n";
+    for (DoubleNode<Log>* aux = registros.getHead(); aux != nullptr; aux = aux->next) {
+        int comparacion = compararDias(aux->data, fecha);
+        if (comparacion > 0) break;
+        if (comparacion == 0) {
+            cout << aux->data << '\n';
+            total++;
+        }
+    }
+    if (total == 0) cout << "No se encontraron registros para ese dia.\n";
+    cout << "Total encontrados: " << total << '\n';
+}
+
+// Invierte los resultados mediante la pila implementada en la Parte A.
+void mostrarDescendente(const DoublyLinkedList<Log>& registros, Log& ultimaFecha,
+                        bool& hayBusqueda) {
+    if (!registros.isSorted()) {
+        cout << "Primero debes ordenar los logs con la opcion 1.\n";
+        return;
+    }
+    if (!hayBusqueda) {
+        cout << "Aun no has buscado un dia.\n";
+        if (!pedirDia(ultimaFecha)) return;
+        hayBusqueda = true;
+    }
+    Stack<Log> pila;
+    for (DoubleNode<Log>* aux = registros.getHead(); aux != nullptr; aux = aux->next) {
+        int comparacion = compararDias(aux->data, ultimaFecha);
+        if (comparacion > 0) break;
+        if (comparacion == 0) pila.push(aux->data);
+    }
+    int total = pila.size();
+    cout << "\nLogs del dia " << ultimaFecha.dayString() << " en orden descendente:\n";
+    if (total == 0) cout << "No se encontraron registros para ese dia.\n";
+    while (!pila.isEmpty()) cout << pila.pop() << '\n';
+    cout << "Total encontrados: " << total << '\n';
+}
+
 int main() {
     cout << "========================================\n";
     cout << "       ANALIZADOR DE LOGS DE RED\n";
@@ -151,13 +246,16 @@ int main() {
         }
         cout << "\nLectura terminada correctamente.\n";
 
+        Log ultimaFecha;
+        bool hayBusqueda = false;
+
         while (true) {
             cout << "\n========================================\n";
             cout << "               MENU PRINCIPAL\n";
             cout << "========================================\n";
             cout << "1. Ordenar logs por fecha y hora\n";
-            cout << "2. Buscar logs por dia (proximamente)\n";
-            cout << "3. Mostrar por dia en orden descendente (proximamente)\n";
+            cout << "2. Buscar logs por dia\n";
+            cout << "3. Mostrar por dia en orden descendente\n";
             cout << "4. Estadisticas del archivo (proximamente)\n";
             cout << "5. Salir\n";
             cout << "Opcion: ";
@@ -165,11 +263,15 @@ int main() {
             if (!getline(cin, opcionMenu)) return 0;
             if (opcionMenu == "1") {
                 ordenarLogs(registros, ruta);
+            } else if (opcionMenu == "2") {
+                buscarPorDia(registros, ultimaFecha, hayBusqueda);
+            } else if (opcionMenu == "3") {
+                mostrarDescendente(registros, ultimaFecha, hayBusqueda);
+            } else if (opcionMenu == "4") {
+                cout << "Esta opcion se implementara en el siguiente commit.\n";
             } else if (opcionMenu == "5") {
                 cout << "Hasta luego.\n";
                 return 0;
-            } else if (opcionMenu == "2" || opcionMenu == "3" || opcionMenu == "4") {
-                cout << "Esta opcion se implementara en el siguiente commit.\n";
             } else {
                 cout << "Opcion invalida.\n";
             }
