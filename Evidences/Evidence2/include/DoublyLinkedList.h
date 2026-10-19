@@ -15,6 +15,62 @@ private:
     DoubleNode<T>* head;
     DoubleNode<T>* tail;
     int size;
+
+    // Divide la cadena de nodos en dos mitades.
+    static DoubleNode<T>* split(DoubleNode<T>* first) {
+        DoubleNode<T>* slow = first;
+        DoubleNode<T>* fast = first;
+        while (fast->next != nullptr && fast->next->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        DoubleNode<T>* second = slow->next;
+        slow->next = nullptr;
+        if (second != nullptr) second->prev = nullptr;
+        return second;
+    }
+
+    // Une dos mitades ordenadas; elige la izquierda si hay empate.
+    static DoubleNode<T>* mergeNodes(DoubleNode<T>* left, DoubleNode<T>* right,
+                                     long long& comparisons) {
+        DoubleNode<T>* first = nullptr;
+        DoubleNode<T>* last = nullptr;
+        while (left != nullptr || right != nullptr) {
+            DoubleNode<T>* selected;
+            if (left == nullptr) {
+                selected = right;
+                right = right->next;
+            } else if (right == nullptr) {
+                selected = left;
+                left = left->next;
+            } else {
+                comparisons++;
+                if (!(right->data < left->data)) {
+                    selected = left;
+                    left = left->next;
+                } else {
+                    selected = right;
+                    right = right->next;
+                }
+            }
+            selected->prev = last;
+            selected->next = nullptr;
+            if (last != nullptr) last->next = selected;
+            else first = selected;
+            last = selected;
+        }
+        return first;
+    }
+
+    static DoubleNode<T>* mergeSortNodes(DoubleNode<T>* first, long long& comparisons,
+                                         int depth, int& maxDepth) {
+        if (depth > maxDepth) maxDepth = depth;
+        if (first == nullptr || first->next == nullptr) return first;
+        DoubleNode<T>* second = split(first);
+        first = mergeSortNodes(first, comparisons, depth + 1, maxDepth);
+        second = mergeSortNodes(second, comparisons, depth + 1, maxDepth);
+        return mergeNodes(first, second, comparisons);
+    }
 public:
 
     DoublyLinkedList()
@@ -277,22 +333,29 @@ public:
 
     }
 
-    void sort() {
-        if (head == nullptr || head->next == nullptr) {
-            return;
-        }
+    // Merge Sort estable; reacomoda nodos sin usar arreglos.
+    void sort(long long& comparisons, int& maxDepth) {
+        comparisons = 0;
+        maxDepth = 0;
+        if (head == nullptr || head->next == nullptr) return;
+        head = mergeSortNodes(head, comparisons, 1, maxDepth);
+        tail = head;
+        while (tail->next != nullptr) tail = tail->next;
+    }
 
-        for (int i = 0; i < size - 1; i++) {
-            DoubleNode<T>* aux = head;
-            for (int j = 0; j < size - i - 1; j++) {
-                if (aux->data > aux->next->data) {
-                    T temp = aux->data;
-                    aux->data = aux->next->data;
-                    aux->next->data = temp;
-                }
-                aux = aux->next;
-            }
+    // Permite mantener las llamadas anteriores a sort().
+    void sort() {
+        long long comparisons;
+        int maxDepth;
+        sort(comparisons, maxDepth);
+    }
+
+    bool isSorted() const {
+        for (DoubleNode<T>* aux = head; aux != nullptr && aux->next != nullptr;
+             aux = aux->next) {
+            if (aux->next->data < aux->data) return false;
         }
+        return true;
     }
 
     void duplicate() {
