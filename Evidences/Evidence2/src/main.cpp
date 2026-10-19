@@ -7,8 +7,6 @@
 #include <fstream>
 #include <string>
 #include <chrono>
-#include <cmath>
-#include <filesystem>
 #include <iomanip>
 #include <map>
 #include "../include/Log.h"
@@ -69,9 +67,10 @@ bool guardarOrdenados(const DoublyLinkedList<Log>& registros) {
     return true;
 }
 
-void ordenarLogs(DoublyLinkedList<Log>& registros, const string& ruta) {
+void ordenarLogs(DoublyLinkedList<Log>& registros, const string& ruta, bool& ordenamientoSolicitado) {
     if (registros.isSorted()) {
         cout << "\nLa lista ya esta ordenada cronologicamente.\n";
+        ordenamientoSolicitado = true;
         guardarOrdenados(registros);
         return;
     }
@@ -91,6 +90,7 @@ void ordenarLogs(DoublyLinkedList<Log>& registros, const string& ruta) {
     int profundidad = 0;
     auto inicio = chrono::steady_clock::now();
     registros.sort(comparaciones, profundidad);
+    ordenamientoSolicitado = registros.isSorted();
     auto fin = chrono::steady_clock::now();
     double milisegundos = chrono::duration<double, milli>(fin - inicio).count();
 
@@ -106,6 +106,15 @@ void ordenarLogs(DoublyLinkedList<Log>& registros, const string& ruta) {
     cout << "Coincidio con el crecimiento teorico del algoritmo: "
          << (prediccion == "1" ? "Si" : "No") << '\n';
     cout << "Orden cronologico correcto: " << (registros.isSorted() ? "Si" : "No") << '\n';
+    bool estable = true;
+    for (DoubleNode<Log>* aux = registros.getHead(); aux != nullptr && aux->next != nullptr; aux = aux->next) {
+        if (aux->data == aux->next->data &&
+            aux->data.arrivalOrder > aux->next->data.arrivalOrder) {
+            estable = false;
+            break;
+        }
+    }
+    cout << "Conservo el orden de llegada en fechas iguales: " << (estable ? "Si" : "No") << '\n';
     guardarOrdenados(registros);
 }
 
@@ -155,8 +164,8 @@ int compararDias(const Log& a, const Log& b) {
 
 // Guarda la ultima fecha consultada para reutilizarla en la opcion 3.
 void buscarPorDia(const DoublyLinkedList<Log>& registros, Log& ultimaFecha,
-                  bool& hayBusqueda) {
-    if (!registros.isSorted()) {
+                  bool& hayBusqueda, bool ordenamientoSolicitado) {
+    if (!ordenamientoSolicitado) {
         cout << "Primero debes ordenar los logs con la opcion 1.\n";
         return;
     }
@@ -180,8 +189,8 @@ void buscarPorDia(const DoublyLinkedList<Log>& registros, Log& ultimaFecha,
 
 // Invierte los resultados mediante la pila implementada en la Parte A.
 void mostrarDescendente(const DoublyLinkedList<Log>& registros, Log& ultimaFecha,
-                        bool& hayBusqueda) {
-    if (!registros.isSorted()) {
+                        bool& hayBusqueda, bool ordenamientoSolicitado) {
+    if (!ordenamientoSolicitado) {
         cout << "Primero debes ordenar los logs con la opcion 1.\n";
         return;
     }
@@ -296,6 +305,7 @@ int main() {
 
         Log ultimaFecha;
         bool hayBusqueda = false;
+        bool ordenamientoSolicitado = false;
 
         while (true) {
             cout << "\n========================================\n";
@@ -310,11 +320,11 @@ int main() {
             string opcionMenu;
             if (!getline(cin, opcionMenu)) return 0;
             if (opcionMenu == "1") {
-                ordenarLogs(registros, ruta);
+                ordenarLogs(registros, ruta, ordenamientoSolicitado);
             } else if (opcionMenu == "2") {
-                buscarPorDia(registros, ultimaFecha, hayBusqueda);
+                buscarPorDia(registros, ultimaFecha, hayBusqueda, ordenamientoSolicitado);
             } else if (opcionMenu == "3") {
-                mostrarDescendente(registros, ultimaFecha, hayBusqueda);
+                mostrarDescendente(registros, ultimaFecha, hayBusqueda, ordenamientoSolicitado);
             } else if (opcionMenu == "4") {
                 mostrarEstadisticas(registros);
             } else if (opcionMenu == "5") {
