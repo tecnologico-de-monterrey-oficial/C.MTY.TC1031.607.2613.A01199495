@@ -7,6 +7,10 @@ add_executable(C_MTY_TC1031_607_2613_A01199495
         Assignments/Act2.2-DoublyLinkedList/DoublyLinkedList.cpp
 )
 
+add_executable(Evidence2
+        Evidences/Evidence2/src/main.cpp
+)
+
 add_executable(TestStructures
         Evidences/Evidence2/tests/TestStructures.cpp
 )
